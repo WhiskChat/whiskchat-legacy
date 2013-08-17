@@ -592,7 +592,6 @@ io.sockets.on('connection', function(socket) {
 		sockets.forEach(function(sock) {
 		    sock.emit('message', {message: 'Kicked by ' + socket.user});
 		    sock.disconnect(); }
-            }
 	    bbcode.parse(stripHTML(chat.message), function(parsedcode) {
 		/* link links */
                 parsedcode = urlify(parsedcode);
