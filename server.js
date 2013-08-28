@@ -1,4 +1,4 @@
-// WhiskChat Server! :D
+// WhiskChat Server! YAY
 
 var express = require('express');
 var app = express();
