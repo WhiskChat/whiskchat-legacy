@@ -1458,11 +1458,13 @@ io.sockets.on('connection', function(socket) {
             }
 	    console.log(socket.user + ' sending ' + draw.amount + ' to ' + draw.address);
 	    if (!socket.user || !draw.amount) {
+	       return socket.emit('message', {message: 'Syntax: /withdraw [amount] [address]'});
+	    }
 	    	if(!draw.address && !db.get('users/' + socket.user + '/btcaddr')) {
                    return socket.emit('message', {message: 'Syntax: /withdraw [amount] [address]'});
+	    	} else {
+	    	   draw.address = db.get('users/' + socket.user + '/btcaddr');
 	    	}
-	    	draw.address = db.get('users/' + socket.user + '/btcaddr');
-	    }
             socket.emit('message', {message: '<i class="icon-signal"></i> Withdrawing ' + ((Number(draw.amount) / 1000) - 0.0001) + ' (with 0.1 mBTC tx fee) BTC to ' + draw.address + '...'});
             bitcoind.sendFrom(socket.user, draw.address, (Number(draw.amount) / 1000) - 0.0001, function(err, res) {
                 if (err) {
