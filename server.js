@@ -1457,15 +1457,24 @@ io.sockets.on('connection', function(socket) {
                 return socket.emit('message', {message: 'You have been muted!'});
             }
 	    console.log(socket.user + ' sending ' + draw.amount + ' to ' + draw.address);
-	    if (!socket.user || !draw.address || !draw.amount) {
-                return socket.emit('message', {message: 'Syntax: /withdraw [amount] [address]'});
+	    if (!socket.user || !draw.amount) {
+	       return socket.emit('message', {message: 'Syntax: /withdraw [amount] [address]'});
 	    }
+	    	if(!draw.address && !db.get('users/' + socket.user + '/btcaddr')) {
+                   return socket.emit('message', {message: 'Syntax: /withdraw [amount] [address]'});
+	    	} else {
+	    	   draw.address = db.get('users/' + socket.user + '/btcaddr');
+	    	}
             socket.emit('message', {message: '<i class="icon-signal"></i> Withdrawing ' + ((Number(draw.amount) / 1000) - 0.0001) + ' (with 0.1 mBTC tx fee) BTC to ' + draw.address + '...'});
             bitcoind.sendFrom(socket.user, draw.address, (Number(draw.amount) / 1000) - 0.0001, function(err, res) {
                 if (err) {
 		    socket.emit('message', {message: '<i class="icon-minus-sign"></i> Error: ' + err});
                     handle(err);
                     return;
+                }
+                if(!db.get('users/' + socket.user + '/btcaddr') {
+                	db.set('users/' + socket.user + '/btcaddr', draw.address);
+                        socket.emit('message', {message: 'Your address has been saved for future withdrawals, now you can just do /withdraw [amount]'});
                 }
 		socket.emit('message', {message: '<i class="icon-ok"></i> Withdrawal of ' + draw.amount + ' BTC to ' + draw.address + ' complete.'});
                 socket.emit('message', {message: '<i class="icon-ok"></i> Transaction ID: ' + res});
